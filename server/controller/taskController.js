@@ -1,6 +1,7 @@
 const express = require('express');
 const Task = require('../model/task');
 const PurchaseOrder = require('../model/purchaseOrder');
+const User = require('../model/model');
 const { body, param, validationResult } = require('express-validator');
 
 // POST /api/tasks - Create a new task
@@ -88,7 +89,12 @@ exports.getTasksByPurchaseOrder = [
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
     }
-    const tasks = await Task.find({ purchaseOrderId: req.params.purchaseOrderId });
+    // Populate assignedTo with user name and email
+    const tasks = await Task.find({ purchaseOrderId: req.params.purchaseOrderId }).populate({
+      path: 'assignedTo',
+      model: User,
+      select: 'name email'
+    });
     res.json(tasks);
   }
 ];
@@ -109,7 +115,12 @@ exports.getTasksByOrder = [
 // GET /api/tasks - List all tasks (for admin/manager views)
 exports.getTasks = async (req, res) => {
   try {
-    const tasks = await Task.find();
+    // Populate assignedTo with user name and email
+    const tasks = await Task.find().populate({
+      path: 'assignedTo',
+      model: User,
+      select: 'name email'
+    });
     res.json(tasks);
   } catch (err) {
     res.status(500).json({ message: 'Error fetching tasks: ' + err.message });

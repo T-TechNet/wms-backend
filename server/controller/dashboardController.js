@@ -56,6 +56,13 @@ const getStats = async (req, res) => {
             Product.countDocuments({ stock: { $lte: 10 } })
         ]);
         const totalRevenue = totalRevenueAgg[0]?.total || 0;
+
+        // Add detailed task status counts
+        const [pendingTasks, inProgressTasks, completedTasksCount] = await Promise.all([
+            Task.countDocuments({ purchaseOrderId: { $exists: true, $ne: null }, status: 'Pending' }),
+            Task.countDocuments({ purchaseOrderId: { $exists: true, $ne: null }, status: 'In Progress' }),
+            Task.countDocuments({ purchaseOrderId: { $exists: true, $ne: null }, status: 'Completed' })
+        ]);
         const stats = {
             totalPOs,
             totalRevenue,
@@ -63,6 +70,9 @@ const getStats = async (req, res) => {
             totalProducts,
             totalTasks,
             completedTasks,
+            pendingTasks,
+            inProgressTasks,
+            completedTasksCount,
             lowStockProducts
         };
         if (role === 'superadmin') {

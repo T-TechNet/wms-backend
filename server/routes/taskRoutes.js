@@ -10,5 +10,6 @@ router.put('/tasks/:id', verifyToken, ...taskController.updateTask);
 router.delete('/tasks/:id', verifyToken, ...taskController.deleteTask);
 router.get('/purchase-orders/:purchaseOrderId/tasks', verifyToken, ...taskController.getTasksByPurchaseOrder);
 router.get('/orders/:orderId/tasks', verifyToken, ...taskController.getTasksByOrder);
+router.get('/tasks', verifyToken, taskController.getTasks);
 
 module.exports = router;
